@@ -4,7 +4,9 @@ import pytz
 def test_log_linev(apcaccess_gen):
     from upslogger.apcdata import get_apc_linev
     from upslogger.logger import log_linev, LOG_FILENAME
+    from upslogger import timezone
     from upslogger.timezone import DT_FMT
+    timezone.TZ = apcaccess_gen.tz
 
     LOG_FIELDS = ['DATE', 'LINEV', 'LINEFREQ']
 

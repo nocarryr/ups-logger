@@ -1,0 +1,158 @@
+[
+    {
+        "field": "APC      ", 
+        "value": "001,048,1181"
+    }, 
+    {
+        "field": "DATE     ", 
+        "value": "{DATE:%Y-%m-%d %H:%M:%S %z}   "
+    }, 
+    {
+        "field": "HOSTNAME ", 
+        "value": "localhost"
+    }, 
+    {
+        "field": "VERSION  ", 
+        "value": "3.14.10 (13 September 2011) debian"
+    }, 
+    {
+        "field": "UPSNAME  ", 
+        "value": "testups"
+    }, 
+    {
+        "field": "CABLE    ", 
+        "value": "Custom Cable Smart"
+    }, 
+    {
+        "field": "DRIVER   ", 
+        "value": "APC Smart UPS (any)"
+    }, 
+    {
+        "field": "UPSMODE  ", 
+        "value": "Stand Alone"
+    }, 
+    {
+        "field": "STARTTIME", 
+        "value": "{STARTTIME:%Y-%m-%d %H:%M:%S %z}  "
+    }, 
+    {
+        "field": "MODEL    ", 
+        "value": "Smart-UPS SC450 RM"
+    }, 
+    {
+        "field": "STATUS   ", 
+        "value": "ONLINE "
+    }, 
+    {
+        "field": "LINEV    ", 
+        "value": "{LINEV:05.1f} Volts"
+    }, 
+    {
+        "field": "LOADPCT  ", 
+        "value": " 47.4 Percent Load Capacity"
+    }, 
+    {
+        "field": "BCHARGE  ", 
+        "value": "100.0 Percent"
+    }, 
+    {
+        "field": "TIMELEFT ", 
+        "value": " 25.0 Minutes"
+    }, 
+    {
+        "field": "MBATTCHG ", 
+        "value": "5 Percent"
+    }, 
+    {
+        "field": "MINTIMEL ", 
+        "value": "3 Minutes"
+    }, 
+    {
+        "field": "MAXTIME  ", 
+        "value": "0 Seconds"
+    }, 
+    {
+        "field": "MAXLINEV ", 
+        "value": "113.0 Volts"
+    }, 
+    {
+        "field": "MINLINEV ", 
+        "value": "110.8 Volts"
+    }, 
+    {
+        "field": "OUTPUTV  ", 
+        "value": "113.0 Volts"
+    }, 
+    {
+        "field": "SENSE    ", 
+        "value": "High"
+    }, 
+    {
+        "field": "DWAKE    ", 
+        "value": "000 Seconds"
+    }, 
+    {
+        "field": "DSHUTD   ", 
+        "value": "060 Seconds"
+    }, 
+    {
+        "field": "DLOWBATT ", 
+        "value": "02 Minutes"
+    }, 
+    {
+        "field": "LOTRANS  ", 
+        "value": "106.0 Volts"
+    }, 
+    {
+        "field": "HITRANS  ", 
+        "value": "127.0 Volts"
+    }, 
+    {
+        "field": "RETPCT   ", 
+        "value": "000.0 Percent"
+    }, 
+    {
+        "field": "ALARMDEL ", 
+        "value": "5 seconds"
+    }, 
+    {
+        "field": "BATTV    ", 
+        "value": "13.7 Volts"
+    }, 
+    {
+        "field": "LINEFREQ ", 
+        "value": "{LINEFREQ:04.1f} Hz"
+    }, 
+    {
+        "field": "LASTXFER ", 
+        "value": "Automatic or explicit self test"
+    }, 
+    {
+        "field": "NUMXFERS ", 
+        "value": "0"
+    }, 
+    {
+        "field": "TONBATT  ", 
+        "value": "0 seconds"
+    }, 
+    {
+        "field": "CUMONBATT", 
+        "value": "0 seconds"
+    }, 
+    {
+        "field": "XOFFBATT ", 
+        "value": "N/A"
+    }, 
+    {
+        "field": "SELFTEST ", 
+        "value": "NO"
+    }, 
+    {
+        "field": "STESTI   ", 
+        "value": "336"
+    }, 
+    {
+        "field": "STATFLAG ", 
+        "value": "0x07000008 "
+    }
+]

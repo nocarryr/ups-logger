@@ -2,6 +2,7 @@
 
 import os
 import io
+import sys
 import time
 import datetime
 import subprocess
@@ -14,6 +15,8 @@ from upslogger import timezone
 from upslogger.fields import Field, DateFieldBase
 from upslogger.plotlyutils import PlotlyRateLimitError, to_plotly
 
+PY3 = sys.version_info.major >= 3
+
 APC_HOSTNAME = 'localhost'
 APC_HOSTPORT = 3551
 
@@ -24,6 +27,8 @@ def get_apc_status(hostname=None, port=None):
         port = APC_HOSTPORT
     cmd_str = 'apcaccess status {}:{}'.format(hostname, port)
     s = subprocess.check_output(shlex.split(cmd_str))
+    if PY3:
+        s = s.decode('UTF-8')
     d = {}
     for line in s.splitlines():
         if ':' in line:

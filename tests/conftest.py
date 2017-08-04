@@ -136,3 +136,8 @@ def apcaccess_gen(monkeypatch):
     print('teardown ApcAccessGenerator')
     g.stop()
     print('teardown complete')
+
+@pytest.fixture(params=[True, False])
+def apcaccess_available(request, monkeypatch):
+    monkeypatch.setattr('upslogger.apcdata.APCACCESS_AVAILABLE', request.param)
+    return request.param

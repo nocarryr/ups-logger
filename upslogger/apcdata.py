@@ -4,6 +4,8 @@ import os
 import io
 import sys
 import time
+import socket
+import errno
 import datetime
 import subprocess
 import shlex
@@ -17,10 +19,11 @@ from upslogger.plotlyutils import PlotlyRateLimitError, to_plotly
 
 PY3 = sys.version_info.major >= 3
 
+APCACCESS_AVAILABLE = True
 APC_HOSTNAME = 'localhost'
 APC_HOSTPORT = 3551
 
-def get_apc_status(hostname=None, port=None):
+def get_apc_status_subprocess(hostname=None, port=None):
     if hostname is None:
         hostname = APC_HOSTNAME
     if port is None:
@@ -36,6 +39,41 @@ def get_apc_status(hostname=None, port=None):
             val = ':'.join(line.split(':')[1:]).strip(' ')
             field = Field.from_string(val, key)
             d[key] = field
+    return d
+
+def get_apc_status_tcp(hostname=None, port=None):
+    if hostname is None:
+        hostname = APC_HOSTNAME
+    if port is None:
+        port = APC_HOSTPORT
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((hostname, port))
+    sock.sendall(b'\x00\x06status')
+    resp = sock.recv(1024)
+    d = {}
+    for line in resp.split(b'\x00'):
+        line = line[1:].strip(b'\n')
+        if PY3:
+            line = line.decode('UTF-8')
+        if ':' in line:
+            key = line.split(':')[0].strip(' ')
+            val = ':'.join(line.split(':')[1:]).strip(' ')
+            field = Field.from_string(val, key)
+            d[key] = field
+    return d
+
+def get_apc_status(hostname=None, port=None):
+    global APCACCESS_AVAILABLE
+    if not APCACCESS_AVAILABLE:
+        return get_apc_status_tcp(hostname, port)
+    try:
+        d = get_apc_status_subprocess(hostname, port)
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            APCACCESS_AVAILABLE = False
+            d = get_apc_status_tcp(hostname, port)
+        else: # pragma: no cover
+            raise
     return d
 
 def get_apc_linev(hostname=None, port=None):

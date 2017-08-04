@@ -41,25 +41,34 @@ def test_log_linev(tz_override, apcaccess_gen):
     for gen_line, log_line in zip(lines_expected, s.splitlines()):
         assert gen_line == log_line
 
-def test_log_parser(tz_override, existing_logfile):
+def test_log_parser(tz_override, existing_logfile, tmpdir):
     from upslogger.logger import parse_logfile
 
-    dt = datetime.datetime(2017, 8, 3, 14, 10, 0)
-    dt = tz_override['local'].localize(dt)
+    with open(str(existing_logfile), 'r') as f:
+        logfile_str = f.read()
 
-    linev = 110.0
-    linefreq = 59.0
+    no_header_log = '\n'.join([line for line in logfile_str.splitlines()[1:]])
+    no_header_logfilename = tmpdir.join('apclinev_no_header.txt')
+    with open(str(no_header_logfilename), 'w') as f:
+        f.write(no_header_log)
 
-    parsed = parse_logfile(str(existing_logfile))
+    for logfile in [existing_logfile, no_header_logfilename]:
 
-    for d in parsed:
-        assert d['DATE'].value == dt
-        assert round(d['LINEV'].value, 1) == round(linev, 1)
-        assert round(d['LINEFREQ'].value, 1) == round(linefreq, 1)
+        dt = datetime.datetime(2017, 8, 3, 14, 10, 0)
+        dt = tz_override['local'].localize(dt)
 
-        dt += datetime.timedelta(seconds=1)
-        linev += .1
-        if linefreq >= 61:
-            linefreq = 59.0
-        else:
-            linefreq += .1
+        linev = 110.0
+        linefreq = 59.0
+        parsed = parse_logfile(str(logfile))
+
+        for d in parsed:
+            assert d['DATE'].value == dt
+            assert round(d['LINEV'].value, 1) == round(linev, 1)
+            assert round(d['LINEFREQ'].value, 1) == round(linefreq, 1)
+
+            dt += datetime.timedelta(seconds=1)
+            linev += .1
+            if linefreq >= 61:
+                linefreq = 59.0
+            else:
+                linefreq += .1

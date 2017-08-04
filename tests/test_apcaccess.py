@@ -1,7 +1,7 @@
 import datetime
 import pytz
 
-def test_apcaccessgen(apcaccess_gen):
+def test_apcaccessgen(tz_override, apcaccess_gen):
     from upslogger import apcdata
     assert apcdata.APC_HOSTPORT == apcaccess_gen.hostport
     assert not apcdata.LOG_FILENAME.startswith('~')
@@ -13,7 +13,7 @@ def test_apcaccessgen(apcaccess_gen):
             continue
         assert field.value == gen_data[field.name]
 
-def test_linev(apcaccess_gen):
+def test_linev(tz_override, apcaccess_gen):
     from upslogger import apcdata
 
     apcaccess_gen.LINEV = 110.0
@@ -21,6 +21,7 @@ def test_linev(apcaccess_gen):
         data = apcdata.get_apc_linev()
         assert round(data['LINEV'].value, 1) == round(apcaccess_gen.LINEV, 1)
         assert data['DATE'].value == apcaccess_gen.DATE
+        assert data['DATE'].value.tzinfo.zone == tz_override['local'].zone
 
         apcaccess_gen.LINEV += .1
         apcaccess_gen.DATE += datetime.timedelta(minutes=1)

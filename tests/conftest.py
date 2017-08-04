@@ -18,11 +18,29 @@ PY3 = sys.version_info.major >= 3
 BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE_PATH, 'data')
 
+TZ_NAME_APC = 'US/Eastern'
+TZ_NAME_LOCAL = 'US/Central'
+
 @pytest.fixture(autouse=True)
 def temp_logfile(tmpdir, monkeypatch):
     lf = tmpdir.join('apclinev.log')
     monkeypatch.setattr('upslogger.logger.LOG_FILENAME', str(lf))
     return lf
+
+@pytest.fixture
+def tz_override(monkeypatch):
+    monkeypatch.setenv('TZ', TZ_NAME_LOCAL)
+    monkeypatch.setattr('upslogger.timezone.TZ', None)
+    import tzlocal
+    tzlocal.reload_localzone()
+    tz_dict = {
+        'local':pytz.timezone(TZ_NAME_LOCAL),
+        'apc':pytz.timezone(TZ_NAME_APC),
+    }
+    assert tz_dict['local'] == tzlocal.get_localzone()
+    yield tz_dict
+    monkeypatch.delenv('TZ')
+    tzlocal.reload_localzone()
 
 @pytest.fixture
 def existing_logfile():
@@ -49,7 +67,7 @@ class NISServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 class ApcAccessGenerator(object):
     _template_attrs = ['DATE', 'STARTTIME', 'LINEV', 'LINEFREQ']
     def __init__(self, **kwargs):
-        tz = self.tz = kwargs.get('timezone', pytz.timezone('US/Central'))
+        tz = self.tz = kwargs.get('timezone', pytz.timezone(TZ_NAME_APC))
         kwargs.setdefault('DATE', datetime.datetime.now())
         kwargs.setdefault('STARTTIME', datetime.datetime.now())
         kwargs.setdefault('LINEV', 115.2)
@@ -81,6 +99,9 @@ class ApcAccessGenerator(object):
                 setattr(self, key, dt)
             if dt.tzinfo is None:
                 dt = self.tz.localize(dt)
+                setattr(self, key, dt)
+            elif dt.tzinfo != self.tz:
+                dt = self.tz.normalize(dt)
                 setattr(self, key, dt)
     def get_template_dict(self):
         self._check_datetimes()

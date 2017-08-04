@@ -1,12 +1,10 @@
 import datetime
 import pytz
 
-def test_log_linev(apcaccess_gen):
+def test_log_linev(tz_override, apcaccess_gen):
     from upslogger.apcdata import get_apc_linev
     from upslogger.logger import log_linev, LOG_FILENAME
-    from upslogger import timezone
     from upslogger.timezone import DT_FMT
-    timezone.TZ = apcaccess_gen.tz
 
     LOG_FIELDS = ['DATE', 'LINEV', 'LINEFREQ']
 
@@ -15,9 +13,9 @@ def test_log_linev(apcaccess_gen):
     ]
 
     def append_gendata():
-        d = {getattr(apcaccess_gen, attr) for attr in LOG_FIELDS}
+        dt = tz_override['local'].normalize(apcaccess_gen.DATE)
         line = '\t'.join([
-            apcaccess_gen.DATE.strftime(DT_FMT),
+            dt.strftime(DT_FMT),
             '{:5.1f}'.format(apcaccess_gen.LINEV),
             '{:4.1f}'.format(apcaccess_gen.LINEFREQ),
         ])
@@ -43,11 +41,11 @@ def test_log_linev(apcaccess_gen):
     for gen_line, log_line in zip(lines_expected, s.splitlines()):
         assert gen_line == log_line
 
-def test_log_parser(existing_logfile):
+def test_log_parser(tz_override, existing_logfile):
     from upslogger.logger import parse_logfile
 
     dt = datetime.datetime(2017, 8, 3, 14, 10, 0)
-    dt = pytz.timezone('US/Central').localize(dt)
+    dt = tz_override['local'].localize(dt)
 
     linev = 110.0
     linefreq = 59.0

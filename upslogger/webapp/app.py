@@ -15,45 +15,47 @@ from upslogger import timezone
 
 
 def get_data():
+    key_map = {'LINEV':'line_voltage', 'LINEFREQ':'frequency'}
     parsed = parse_logfile()
-    volt_x = []
-    volt_y = []
-    freq_x = []
-    freq_y = []
+    data = {}
     for d in parsed:
         x = timezone.as_timezone(d['DATE'].value, 'UTC')
+        ts = timezone.to_timestamp(x)
         x = x.replace(tzinfo=None)
-        vy = d.get('LINEV')
-        fy = d.get('LINEFREQ')
-        if vy is not None and vy.value is not None:
-            volt_x.append(x)
-            volt_y.append(vy.value)
-        if fy is not None and fy.value is not None:
-            freq_x.append(x)
-            freq_y.append(fy.value)
-    return {
-        'Voltage':{'date':volt_x, 'line_voltage':volt_y},
-        'Frequency':{'date':freq_x, 'frequency':freq_y},
-    }
+        if ts not in data:
+            data[ts] = {'date':x}
+        for parse_key, data_key in key_map.items():
+            value = d.get(parse_key)
+            if value is not None:
+                value = value.value
+            data[ts][data_key] = value
+    return data
 
-data_src = ColumnDataSource(data={'date':[], 'line_voltage':[], 'offset_applied':[]})
-datetimes_sent = []
+data_src = ColumnDataSource(
+    data={
+        'date':[],
+        'line_voltage':[],
+        'frequency':[],
+        'offset_applied':[],
+        'timestamp':[],
+    },
+)
 
 def update_data_src(*args):
-    global datetimes_sent
     data = get_data()
-    d = {'date':[], 'line_voltage':[]}
-    for dt, y in zip(data['Voltage']['date'], data['Voltage']['line_voltage']):
-        ts = timezone.to_timestamp(timezone.make_aware(dt, 'UTC'))
-        if ts in datetimes_sent:
-            continue
-        d['date'].append(dt)
-        d['line_voltage'].append(y)
-        datetimes_sent.append(ts)
-    d['offset_applied'] = [False] * len(d['date'])
-    if not len(d['date']):
+    result = {'timestamp':[]}
+    timestamps = set(data.keys())
+    timestamps -= set(data_src.data['timestamp'])
+    for ts in sorted(timestamps):
+        result['timestamp'].append(ts)
+        for data_key, value in data[ts].items():
+            if data_key not in result:
+                result[data_key] = []
+            result[data_key].append(value)
+    if not len(result['timestamp']):
         return
-    data_src.stream(d)
+    result['offset_applied'] = [False] * len(result['timestamp'])
+    data_src.stream(result)
 
 hover = HoverTool(
     tooltips=[

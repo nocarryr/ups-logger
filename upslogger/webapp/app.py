@@ -60,7 +60,7 @@ def update_data_src(*args):
 hover = HoverTool(
     tooltips=[
         ('date', '@date{%a %x %X}'),
-        ('line_voltage', '@line_voltage{%05.1f Hz}'),
+        ('line_voltage', '@line_voltage{%05.1f v}'),
     ],
     formatters={
         'date':'datetime',
